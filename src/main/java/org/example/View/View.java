@@ -31,7 +31,7 @@ public class View extends JFrame {
 
          button2= new JButton("Select File");
         button2.setAlignmentX(Component.CENTER_ALIGNMENT);  // Center the button
-        add(button2);
+        // add(button2);
 
         textArea = new JTextArea();
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 14));

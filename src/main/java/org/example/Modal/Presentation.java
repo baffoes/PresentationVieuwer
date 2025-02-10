@@ -1,24 +1,23 @@
 package org.example.Modal;
 
-import javax.swing.*;
 import java.util.List;
 
-public class Presentation {
-    private String title;
-    private List<Slide> slides;
-    private int currentIndex;
 
-    public Presentation(String title, List<Slide> slides, int currentIndex) {
-        this.title = title;
+public class Presentation {
+    private String showTitle;
+    private List<Slide> slides;
+
+    public Presentation(String showTitle, List<Slide> slides) {
+        this.showTitle = showTitle;
         this.slides = slides;
-        this.currentIndex = currentIndex;
     }
 
-    public String getTitle() {
-        return title;
+    public String getShowTitle() {
+        return showTitle;
     }
 
     public List<Slide> getSlides() {
         return slides;
     }
 }
+

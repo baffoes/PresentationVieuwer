@@ -1,15 +1,16 @@
 package org.example.Modal;
 
-public class Slide {
-    private String type;
-    private String content;
-    private long indentation;
-    private String src;
+import java.util.List;
 
-    public Slide(String type, String content, long indentation, String src) {
-        this.type = type;
-        this.content = content;
-        this.indentation = indentation;
-        this.src = src;
+public class Slide {
+    private List<SlideContent> contents;
+
+    public Slide(List<SlideContent> contents) {
+        this.contents = contents;
+    }
+
+    public List<SlideContent> getContents() {
+        return contents;
     }
 }
+

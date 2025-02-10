@@ -2,12 +2,14 @@ package org.example.Controller;
 
 import org.example.Modal.JsonLoader;
 import org.example.Modal.Presentation;
+import org.example.Modal.Slide;
 import org.example.View.View;
 import org.json.simple.parser.ParseException;
 
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class Controller {
 
@@ -29,9 +31,11 @@ public class Controller {
             }
             System.out.println("Files unzipped successfully.");
             view.updateTextArea(jsonLoader.loadJson(destinationFolder));
+            this.presentation = jsonLoader.loadJson2(destinationFolder);
+            jsonLoader.displayPresentation(this.presentation);
         });
 
-        view.addSelectButtonListener(e -> {
+        /* view.addSelectButtonListener(e -> {
             String destinationFolder = "unzipped";
             try {
                 jsonLoader.unzip(chooseFile(), destinationFolder);
@@ -41,11 +45,9 @@ public class Controller {
             System.out.println("Files unzipped successfully.");
             view.updateTextArea(jsonLoader.loadJson(destinationFolder));
         });
+         */
+
     }
-
-
-
-
 
     public String chooseFile() {
         JFileChooser fileChooser = new JFileChooser();

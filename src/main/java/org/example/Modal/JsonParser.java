@@ -12,46 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class JsonLoader extends Fileloader {
-
-    // Change to return a single Presentation
-    public Presentation loadJson(String folderPath) {
-        File folder = new File(folderPath);
-        List<Slide> slideList = new ArrayList<>();
-        String showTitle = "";
-
-        if (folder.isDirectory()) {
-            File[] files = folder.listFiles();
-
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isDirectory()) {
-                        // Recursively load presentations from subdirectories (if necessary)
-                        Presentation presentation = loadJson(file.getAbsolutePath());
-                        if (presentation != null) {
-                            slideList.addAll(presentation.getSlides());
-                        }
-                    } else if (file.getName().endsWith(".json")) {
-                        // Load the individual presentation from the JSON file
-                        Presentation presentation = parseFile(file.getAbsolutePath());
-                        if (presentation != null) {
-                            // Only set the showTitle from the first JSON file
-                            if (showTitle.isEmpty()) {
-                                showTitle = presentation.getShowTitle();
-                            }
-                            slideList.addAll(presentation.getSlides());
-                        }
-                    }
-                }
-            }
-        }
-        else {
-            System.out.println("Provided path is not a valid directory.");
-        }
-
-        // Return a single Presentation object with the loaded slides
-        return slideList.isEmpty() ? null : new Presentation(showTitle, slideList);
-    }
+public class JsonParser extends Fileloader {
 
 
     public Presentation parseFile(String filePath) {
@@ -62,7 +23,8 @@ public class JsonLoader extends Fileloader {
         try (FileReader reader = new FileReader(filePath)) {
             JSONObject jsonObject = (JSONObject) parser.parse(reader);
              String showTitle = (String) jsonObject.get("showtitle");
-            System.out.println("Show Title: " + showTitle);
+             // show_Title = showTitle;
+             System.out.println("Show Title: " + showTitle);
 
             JSONArray slides = (JSONArray) jsonObject.get("slides");
 

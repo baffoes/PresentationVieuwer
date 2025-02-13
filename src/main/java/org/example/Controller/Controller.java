@@ -1,41 +1,50 @@
 package org.example.Controller;
 
-import org.example.Modal.JsonLoader;
-import org.example.Modal.Presentation;
-import org.example.Modal.Slide;
+import org.example.Modal.*;
 import org.example.View.View;
-import org.json.simple.parser.ParseException;
-
 import javax.swing.*;
 import java.io.File;
-import java.io.IOException;
-import java.util.List;
 
 public class Controller {
 
     private Presentation presentation;
-    private JsonLoader jsonLoader;
+    private Fileloader fileLoader;  // Parent type
     private View view;
+    String destinationFolder = "unzipped";
 
-    public Controller(Presentation presentation, JsonLoader jsonLoader, View view) {
+    public Controller(Presentation presentation, Fileloader fileLoader, View view) {
         this.presentation = presentation;
-        this.jsonLoader = jsonLoader;
+        this.fileLoader = fileLoader;
         this.view = view;
 
-        view.addSelectButtonListener(e -> {
-            String destinationFolder = "unzipped";
-            try {
-                jsonLoader.unzip(chooseFile(), destinationFolder);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-            System.out.println("Files unzipped successfully.");
-           // view.updateTextArea(jsonLoader.loadJson(destinationFolder));
-            this.presentation = jsonLoader.loadJson(destinationFolder);
-            view.setPresentation(this.presentation);
-            jsonLoader.displayPresentation(this.presentation);
+        view.addSelectButtonListener(e -> selectFile());
+
+        view.addExitButtonListener(e -> {
+           exitAplication();
         });
 
+        //Zorgt er voor als de aplicatie zomaar dicht gaat dat de unzipped folder weer leeg is
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("Application is closing, cleaning up resources...");
+            fileLoader.deleteFolderContents(destinationFolder);
+        }));
+    }
+
+    public void selectFile() {
+        String filePath = chooseFile();
+        try {
+            // Unzip the file and load the presentation
+            fileLoader.unzip(filePath, destinationFolder);
+            this.presentation = fileLoader.load(destinationFolder);
+            view.setPresentation(this.presentation);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void exitAplication() {
+        fileLoader.deleteFolderContents(destinationFolder);
+        view.dispose();
     }
 
     public String chooseFile() {
@@ -46,11 +55,8 @@ public class Controller {
 
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
-            return ((java.io.File) selectedFile).getAbsolutePath();
+            return selectedFile.getAbsolutePath();
         }
         return "No file selected";
     }
-
-
-
 }

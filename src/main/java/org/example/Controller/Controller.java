@@ -30,22 +30,11 @@ public class Controller {
                 throw new RuntimeException(ex);
             }
             System.out.println("Files unzipped successfully.");
-            view.updateTextArea(jsonLoader.loadJson(destinationFolder));
-            this.presentation = jsonLoader.loadJson2(destinationFolder);
+           // view.updateTextArea(jsonLoader.loadJson(destinationFolder));
+            this.presentation = jsonLoader.loadJson(destinationFolder);
+            view.setPresentation(this.presentation);
             jsonLoader.displayPresentation(this.presentation);
         });
-
-        /* view.addSelectButtonListener(e -> {
-            String destinationFolder = "unzipped";
-            try {
-                jsonLoader.unzip(chooseFile(), destinationFolder);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-            System.out.println("Files unzipped successfully.");
-            view.updateTextArea(jsonLoader.loadJson(destinationFolder));
-        });
-         */
 
     }
 

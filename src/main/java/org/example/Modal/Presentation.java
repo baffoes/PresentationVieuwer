@@ -12,6 +12,10 @@ public class Presentation {
         this.slides = slides;
     }
 
+    public void setShowTitle(String showTitle) {
+        this.showTitle = showTitle;
+    }
+
     public String getShowTitle() {
         return showTitle;
     }

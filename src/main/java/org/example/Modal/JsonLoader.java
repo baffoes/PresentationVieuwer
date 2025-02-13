@@ -6,101 +6,16 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class JsonLoader extends Fileloader {
 
-    public String loadJson(String folderPath) {
-        StringBuilder result = new StringBuilder();
-        File folder = new File(folderPath);
-
-        // Debug: Print the folder path
-        System.out.println("Checking folder: " + folderPath);
-
-        if (folder.isDirectory()) {
-            // List all files and directories in the current folder
-            File[] files = folder.listFiles();
-
-            // If the folder is not empty
-            if (files != null) {
-                for (File file : files) {
-                    // If the file is a directory, recurse into it
-                    if (file.isDirectory()) {
-                        System.out.println("Entering directory: " + file.getName());
-                        // Recursively search the subdirectory
-                        result.append(loadJson(file.getAbsolutePath()));
-                    } else if (file.getName().endsWith(".json")) {
-                        // If the file is a JSON file, parse it and stop searching
-                        System.out.println("Found JSON file: " + file.getName());
-                        String parsedContent = parseFile(file.getAbsolutePath());
-                        result.append(parsedContent).append("\n");
-
-                        // Return the result and stop further search
-                        return result.toString();  // Stops searching once the JSON file is found
-                    }
-                }
-            }
-        } else {
-            result.append("Provided path is not a valid directory.\n");
-        }
-
-        return result.toString();
-    }
-
-    public String parseFile(String filePath) {
-        StringBuilder result = new StringBuilder();
-        JSONParser parser = new JSONParser();
-
-        try (FileReader reader = new FileReader(filePath)) {
-            // Parse the JSON file
-            JSONObject jsonObject = (JSONObject) parser.parse(reader);
-
-            // Get the showtitle
-            String showTitle = (String) jsonObject.get("showtitle");
-            result.append("Show Title: ").append(showTitle).append("\n");
-
-            // Get the slides array
-            JSONArray slides = (JSONArray) jsonObject.get("slides");
-
-            // Iterate through each slide
-            for (int i = 0; i < slides.size(); i++) {
-                JSONArray slide = (JSONArray) slides.get(i);
-                result.append("Slide ").append(i + 1).append(":\n");
-
-                // Iterate through each item in the slide
-                for (Object obj : slide) {
-                    JSONObject slideItem = (JSONObject) obj;
-                    String type = (String) slideItem.get("type");
-                    result.append("  Type: ").append(type).append("\n");
-
-                    // Process based on the type
-                    if ("title".equals(type)) {
-                        String content = (String) slideItem.get("content");
-                        result.append("    Title Content: ").append(content).append("\n");
-                    } else if ("text".equals(type)) {
-                        String content = (String) slideItem.get("content");
-                        long indentation = (long) slideItem.get("indentation");
-                        result.append("    Text Content: ").append(content)
-                                .append(" (Indentation: ").append(indentation).append(")\n");
-                    } else if ("image".equals(type)) {
-                        String src = (String) slideItem.get("src");
-                        result.append("    Image Source: ").append(src).append("\n");
-                    }
-                }
-            }
-
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-            result.append("Error reading JSON file: ").append(e.getMessage()).append("\n");
-        }
-
-        return result.toString();
-    }
-
     // Change to return a single Presentation
-    public Presentation loadJson2(String folderPath) {
+    public Presentation loadJson(String folderPath) {
         File folder = new File(folderPath);
         List<Slide> slideList = new ArrayList<>();
         String showTitle = "";
@@ -112,13 +27,13 @@ public class JsonLoader extends Fileloader {
                 for (File file : files) {
                     if (file.isDirectory()) {
                         // Recursively load presentations from subdirectories (if necessary)
-                        Presentation presentation = loadJson2(file.getAbsolutePath());
+                        Presentation presentation = loadJson(file.getAbsolutePath());
                         if (presentation != null) {
                             slideList.addAll(presentation.getSlides());
                         }
                     } else if (file.getName().endsWith(".json")) {
                         // Load the individual presentation from the JSON file
-                        Presentation presentation = parseFile2(file.getAbsolutePath());
+                        Presentation presentation = parseFile(file.getAbsolutePath());
                         if (presentation != null) {
                             // Only set the showTitle from the first JSON file
                             if (showTitle.isEmpty()) {
@@ -129,7 +44,8 @@ public class JsonLoader extends Fileloader {
                     }
                 }
             }
-        } else {
+        }
+        else {
             System.out.println("Provided path is not a valid directory.");
         }
 
@@ -138,14 +54,14 @@ public class JsonLoader extends Fileloader {
     }
 
 
-    public Presentation parseFile2(String filePath) {
+    public Presentation parseFile(String filePath) {
         List<Slide> slideList = new ArrayList<>();
         JSONParser parser = new JSONParser();
-        String showTitle = "";
+
 
         try (FileReader reader = new FileReader(filePath)) {
             JSONObject jsonObject = (JSONObject) parser.parse(reader);
-            showTitle = (String) jsonObject.get("showtitle");
+             String showTitle = (String) jsonObject.get("showtitle");
             System.out.println("Show Title: " + showTitle);
 
             JSONArray slides = (JSONArray) jsonObject.get("slides");
@@ -159,7 +75,14 @@ public class JsonLoader extends Fileloader {
                     String type = (String) slideItem.get("type");
                     String content = (String) slideItem.get("content");
                     Long indentation = slideItem.get("indentation") != null ? (Long) slideItem.get("indentation") : 0;
-                    String src = (String) slideItem.get("src");
+
+                    Path originalPath = Paths.get(filePath);
+                    Path modifiedPath = originalPath.getParent();
+
+                    String fileName = slideItem.get("src") != null ? slideItem.get("src").toString() : "";
+                    String fileNameFinal = modifiedPath.toString() + fileName;
+                    String src = fileNameFinal.replace("\\", "/");
+
 
                     // Create SlideContent object
                     SlideContent slideContent = new SlideContent(type, content, indentation, src);
@@ -186,10 +109,8 @@ public class JsonLoader extends Fileloader {
             System.out.println("No presentation to display.");
             return;
         }
-
         System.out.println("Presentation Title: " + presentation.getShowTitle());
         System.out.println("Number of Slides: " + presentation.getSlides().size());
-
         for (Slide slide : presentation.getSlides()) {
             System.out.println("\n--- Slide ---");
             List<SlideContent> slideContents = slide.getContents();

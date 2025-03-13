@@ -1,4 +1,6 @@
-package org.example.Modal;
+package org.example.Model;
+
+import org.example.Model.SlideContent.SlideContent;
 
 import java.util.List;
 

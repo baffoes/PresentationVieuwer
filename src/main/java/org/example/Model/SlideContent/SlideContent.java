@@ -1,4 +1,24 @@
-package org.example.Modal;
+package org.example.Model.SlideContent;
+
+// Abstracte klasse voor polymorfisme
+public abstract class SlideContent {
+    private final Long indentation;
+
+    public SlideContent(Long indentation) {
+        this.indentation = indentation;
+    }
+
+    public long getIndentation() {
+        return indentation;
+    }
+
+    public abstract String getContent();
+}
+
+
+
+
+/*package org.example.Modal;
 
 public class SlideContent {
     private String type;
@@ -30,3 +50,4 @@ public class SlideContent {
     }
 
 }
+*/

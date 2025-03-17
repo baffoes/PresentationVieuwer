@@ -1,9 +1,7 @@
 package org.example.Controller;
 
 import org.example.Model.*;
-import org.example.Utilities.DirectoryCleaner;
-import org.example.Utilities.FileLoader;
-import org.example.Utilities.Unzipper;
+import org.example.Utilities.*;
 import org.example.View.View;
 
 import javax.swing.*;
@@ -62,7 +60,6 @@ public class Controller {
             JOptionPane.showMessageDialog(view, "No file selected!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
         try {
             // Delete folder content
             DirectoryCleaner.deleteFolderContents(destinationFolder);
@@ -71,8 +68,8 @@ public class Controller {
             Unzipper.unzip(filePath, destinationFolder);
 
             // Load the presentation
-            this.presentation = new FileLoader().load(destinationFolder);
-            view.setPresentation(this.presentation);
+            this.presentation = new FileLoader().loadPresentation(destinationFolder);
+            view.displayPresentation(this.presentation);
             currentSlideIndex = 0;
             updateSlideDisplay();
 

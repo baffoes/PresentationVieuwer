@@ -3,8 +3,10 @@ package org.example.Model.SlideContent;
 // Abstracte klasse voor polymorfisme
 public abstract class SlideContent {
     private final Long indentation;
+    private String content;
 
-    public SlideContent(Long indentation) {
+    public SlideContent(String content,Long indentation) {
+        this.content = content;
         this.indentation = indentation;
     }
 
@@ -12,7 +14,9 @@ public abstract class SlideContent {
         return indentation;
     }
 
-    public abstract String getContent();
+    public String getContent(){
+        return content;
+    }
 }
 
 

@@ -1,15 +1,15 @@
 package org.example.Model.SlideContent;
 
 public class TextContent extends SlideContent {
-    private final String text;
+    private String font;
 
-    public TextContent(String text, Long indentation) {
-        super(indentation);
-        this.text = text;
+    // Constructor that includes font information
+    public TextContent(String content, Long indentation, String font) {
+        super(content, indentation);  // Pass content and indentation to the base class
+        this.font = font != null ? font : "Arial";  // Default font to Arial if null
     }
 
-    @Override
-    public String getContent() {
-        return text;
+    public String getFont() {
+        return font;
     }
 }

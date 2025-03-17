@@ -1,10 +1,8 @@
 package org.example.Utilities;
 
-import org.example.Model.Presentation;
-import org.example.Model.Slide;
-import org.example.Model.SlideContent.ImageContent;
-import org.example.Model.SlideContent.SlideContent;
-import org.example.Model.SlideContent.TextContent;
+import org.example.Model.SlideContent.*;
+import org.example.Model.*;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -16,9 +14,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JsonParser extends FileLoader {
+public class JsonParser extends FileParser {
 
-
+    @Override
     public Presentation parseFile(String filePath) {
         List<Slide> slideList = new ArrayList<>();
         JSONParser parser = new JSONParser();
@@ -35,11 +33,14 @@ public class JsonParser extends FileLoader {
                 for (Object obj : slideItems) {
                     JSONObject slideItem = (JSONObject) obj;
                     Long indentation = slideItem.get("indentation") != null ? (Long) slideItem.get("indentation") : 0;
+                    String font = (String) slideItem.get("font");  // Extract font info
 
                     // Verwerken van tekstuele inhoud
                     if (slideItem.containsKey("content")) {
                         String content = (String) slideItem.get("content");
-                        slideContents.add(new TextContent(content, indentation));
+
+                        // Create TextContent with font and indentation
+                        slideContents.add(new TextContent(content, indentation, font));
                     }
                     // Verwerken van afbeeldingen
                     else if (slideItem.containsKey("src")) {
@@ -49,7 +50,7 @@ public class JsonParser extends FileLoader {
                         String fileNameFinal = modifiedPath.toString() + "/" + src;
                         String srcFinal = fileNameFinal.replace("\\", "/");
 
-                        slideContents.add(new ImageContent(srcFinal));
+                        slideContents.add(new ImageContent(srcFinal, indentation));
                     }
                 }
 

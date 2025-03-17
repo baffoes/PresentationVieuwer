@@ -1,18 +1,16 @@
 package org.example.Utilities;
 
-import org.example.Model.Presentation;
-import org.example.Model.Slide;
-import org.example.Model.SlideContent.ImageContent;
-import org.example.Model.SlideContent.SlideContent;
-import org.example.Model.SlideContent.TextContent;
+import org.example.Model.SlideContent.*;
+import org.example.Model.*;
+
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 import java.nio.file.*;
 import java.util.*;
 
-public class XmlParser extends FileLoader {
+public class XmlParser extends FileParser    {
 
-
+    @Override
     public Presentation parseFile(String filePath) {
         List<Slide> slideList = new ArrayList<>();
 
@@ -36,8 +34,7 @@ public class XmlParser extends FileLoader {
                 NodeList titleNodeList = ((Element) slideNode).getElementsByTagName("title");
                 if (titleNodeList.getLength() > 0) {
                     String titleText = titleNodeList.item(0).getTextContent();
-                    String font = ((Element) titleNodeList.item(0)).getAttribute("font");
-                    slideContents.add(new TextContent(titleText,0L));
+                    slideContents.add(new TitleContent(titleText));
                 }
 
                 // Extract text elements
@@ -48,7 +45,7 @@ public class XmlParser extends FileLoader {
                     Long indentation = ((Element) textNode).hasAttribute("indentation") ?
                             Long.parseLong(((Element) textNode).getAttribute("indentation")) : 0L;
                     String font = ((Element) textNode).getAttribute("font");
-                    slideContents.add(new TextContent(textContent, indentation));
+                    slideContents.add(new TextContent(textContent, indentation,font));
                 }
 
                 // Extract image elements
@@ -63,7 +60,10 @@ public class XmlParser extends FileLoader {
                     String fileNameFinal = modifiedPath.toString() + "/" + src;
                     String srcFinal = fileNameFinal.replace("\\", "/");
 
-                    slideContents.add(new ImageContent(srcFinal));
+                    Long indentation = ((Element) imageNode).hasAttribute("indentation") ?
+                            Long.parseLong(((Element) imageNode).getAttribute("indentation")) : 0L;
+
+                    slideContents.add(new ImageContent(srcFinal, indentation));
                 }
 
                 // Create Slide object and add it to the slideList

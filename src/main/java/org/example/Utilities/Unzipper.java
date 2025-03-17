@@ -1,11 +1,7 @@
 package org.example.Utilities;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.io.*;
+import java.util.zip.*;
 
 public class Unzipper {
     public static void unzip(String zipFile, String destFolder) throws IOException {

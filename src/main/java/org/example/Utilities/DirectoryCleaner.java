@@ -20,16 +20,16 @@ public class DirectoryCleaner {
             if (file.isDirectory()) {
                 // Recursively delete contents of subdirectories
                 deleteFolderContents(file.getAbsolutePath());
-                System.out.println("Deleting existing file: " + file.getAbsolutePath());
-            }
-
-
-            // Attempt to delete the file or folder
-            if (!file.delete()) {
-                System.out.println("Failed to delete: " + file.getAbsolutePath());
+                System.out.println("Deleting folder: " + file.getAbsolutePath());
+                if (!file.delete()) {
+                    System.out.println("Failed to delete folder: " + file.getAbsolutePath());
+                }
+            } else {
+                System.out.println("Deleting file: " + file.getAbsolutePath());
+                if (!file.delete()) {
+                    System.out.println("Failed to delete file: " + file.getAbsolutePath());
+                }
             }
         }
     }
-
-
 }

@@ -1,7 +1,6 @@
 package org.example.Utilities;
 
-import org.example.Model.Presentation;
-import org.example.Model.Slide;
+import org.example.Model.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -9,9 +8,9 @@ import java.util.List;
 
 public class FileLoader {
 
-public String showTitle;
+    public String showTitle;
 
-    public Presentation load(String folderPath) {
+    public Presentation loadPresentation(String folderPath) {
         File folder = new File(folderPath);
         List<Slide> slideList = new ArrayList<>();
 
@@ -20,35 +19,43 @@ public String showTitle;
             if (files != null) {
                 for (File file : files) {
                     if (file.isDirectory()) {
-                        Presentation presentation = load(file.getAbsolutePath());
+                        // Recursively load presentations from subdirectories
+                        Presentation presentation = loadPresentation(file.getAbsolutePath());
                         if (presentation != null) {
                             slideList.addAll(presentation.getSlides());
+                            // Only update showTitle if it's the first valid title
+                            if (presentation.getShowTitle() != null && showTitle == null) {
+                                showTitle = presentation.getShowTitle();
+                            }
                         }
                     } else {
-                        loadPresentation(file, slideList);
+                        // Process individual files (not directories)
+                        FileParser parser = getParserForFile(file);
+                        if (parser != null) {
+                            // Parse the file to get the presentation
+                            Presentation presentation = parser.parseFile(file.getAbsolutePath());
+                            if (presentation != null) {
+                                slideList.addAll(presentation.getSlides());
+                                if (showTitle == null) {
+                                    showTitle = presentation.getShowTitle();
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
 
+        // Return a new Presentation only if slides were found
         return slideList.isEmpty() ? null : new Presentation(showTitle, slideList);
     }
 
-    private void loadPresentation(File file, List<Slide> slideList) {
+    private FileParser getParserForFile(File file) {
         if (file.getName().endsWith(".json")) {
-            JsonParser jsonParser = new JsonParser();
-            Presentation presentation = jsonParser.parseFile(file.getAbsolutePath());
-            if (presentation != null) {
-                slideList.addAll(presentation.getSlides());
-                showTitle = presentation.getShowTitle();
-            }
+            return new JsonParser(); // Return the JSON parser for JSON files
         } else if (file.getName().endsWith(".xml")) {
-            XmlParser xmlParser = new XmlParser();
-            Presentation presentation = xmlParser.parseFile(file.getAbsolutePath());
-            if (presentation != null) {
-                slideList.addAll(presentation.getSlides());
-                showTitle = presentation.getShowTitle();
-            }
+            return new XmlParser(); // Return the XML parser for XML files
         }
+        return null;  // Return null for unsupported file types
     }
 }
